@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.folkol</groupId>
-    <artifactId>zk-updater</artifactId>
+    <artifactId>zk-failover-log-logger</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
@@ -38,14 +38,14 @@
     </dependencies>
 
     <build>
-        <finalName>zk-updater</finalName>
+        <finalName>zk-failover-log-logger</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.folkol.ZkUpdater</mainClass>
+                            <mainClass>com.folkol.ZkFailoverLogLogger</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

@@ -6,19 +6,18 @@ import com.couchbase.client.deps.io.netty.util.ReferenceCounted;
 import kafka.utils.ZKStringSerializer$;
 import org.I0Itec.zkclient.ZkClient;
 
-public class ZkUpdater
+public class ZkFailoverLogLogger
 {
     private static ZkClient zkClient;
     private static String cbHost;
     private static String zkHost;
     private static String bucket;
     private static String passwd;
-    private static String dcpClientName;
 
     public static void main(String[] args) throws Exception
     {
-        if (args.length != 5) {
-            System.out.println("usage: java ZkUpdater cbHost zkHost bucketname bucketpasswd dcpClientName");
+        if (args.length != 4) {
+            System.out.println("usage: java ZkFailoverLogLogger cbHost zkHost bucketname bucketpasswd");
             System.exit(1);
         }
 
@@ -26,7 +25,6 @@ public class ZkUpdater
         zkHost = args[1];
         bucket = args[2];
         passwd = args[3];
-        dcpClientName = args[4];
 
         zkClient = new ZkClient(zkHost, 4000, 6000, ZKStringSerializer$.MODULE$);
 
@@ -43,34 +41,18 @@ public class ZkUpdater
               .toBlocking()
               .forEach(buffer -> {
                   if (DcpFailoverLogResponse.is(buffer)) {
-                      System.out.println("Got failover log entry: " + DcpFailoverLogResponse.toString(buffer));
-
                       short partition = DcpFailoverLogResponse.vbucket(buffer);
-                      long vid = DcpFailoverLogResponse.vbuuidEntry(buffer, 0);
-                      long seqno = DcpFailoverLogResponse.seqnoEntry(buffer, 0);
-
-                      writeState(partition, vid, seqno);
+                      int numEntries = DcpFailoverLogResponse.numLogEntries(buffer);
+                      for (int i = 0; i < numEntries; i++) {
+                          long vid = DcpFailoverLogResponse.vbuuidEntry(buffer, 0);
+                          long seqno = DcpFailoverLogResponse.seqnoEntry(buffer, 0);
+                          System.out.printf("%d\t%d\t%d\t%d%n", partition, i, vid, seqno);
+                      }
                   } else {
-                      System.out.println("Expected DcpFailoverLog, got: " + buffer);
+                      System.err.println("Expected DcpFailoverLog, got: " + buffer);
                   }
-
               });
         client.disconnect().await();
         zkClient.close();
-    }
-
-    private static String pathForState(final short partition) {
-        return String.format("/%s/%s/%d", dcpClientName, bucket, partition);
-    }
-
-    private static void writeState(short partition, long vid, long seqno) {
-        zkClient.createPersistent(pathForState(partition), true);
-        String json = String.format("{\"vbucketUUID\": %d, \"sequenceNumber\": %d}",
-                                    vid,
-                                    seqno);
-
-        String path = pathForState(partition);
-        System.out.printf("Updating state %s -> %s%n", path, json);
-        zkClient.writeData(path, json);
     }
 }
