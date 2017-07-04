@@ -9,3 +9,7 @@ mvn clean compile assembly:single
 ## Run
 
 java -jar target/zk-updater-jar-with-dependencies.jar localhost localhost cmbucket cmpasswd couchbase-kafka-connector2
+
+## Release
+
+Tag and push. Update cbfailover in homebrew-tap.
