@@ -1,5 +1,5 @@
 #!/bin/sh -e
 
 cd $(dirname $(greadlink -f "$0"))
-java -jar ../cbfailover.jar $@
+java -jar ../target/zk-failover-log-logger-jar-with-dependencies.jar $@
 
