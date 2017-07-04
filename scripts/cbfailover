@@ -1,5 +1,5 @@
 #!/bin/sh -e
 
 cd $(dirname $(greadlink -f "$0"))
-java -jar ../target/zk-failover-log-logger-jar-with-dependencies.jar $@
+java -jar ../zk-failover-log-logger-jar-with-dependencies.jar $@
 
