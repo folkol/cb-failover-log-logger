@@ -1,0 +1,5 @@
+#!/bin/sh -e
+
+cd $(dirname $(greadlink -f "$0"))
+java -jar ../cbfailover.jar $@
+
