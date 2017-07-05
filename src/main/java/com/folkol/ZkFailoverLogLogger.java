@@ -44,8 +44,8 @@ public class ZkFailoverLogLogger
                       short partition = DcpFailoverLogResponse.vbucket(buffer);
                       int numEntries = DcpFailoverLogResponse.numLogEntries(buffer);
                       for (int i = 0; i < numEntries; i++) {
-                          long vid = DcpFailoverLogResponse.vbuuidEntry(buffer, 0);
-                          long seqno = DcpFailoverLogResponse.seqnoEntry(buffer, 0);
+                          long vid = DcpFailoverLogResponse.vbuuidEntry(buffer, i);
+                          long seqno = DcpFailoverLogResponse.seqnoEntry(buffer, i);
                           System.out.printf("%d\t%d\t%d\t%d%n", partition, i, vid, seqno);
                       }
                   } else {
